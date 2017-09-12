@@ -1,1 +1,79 @@
-<h1>soio</h1>
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+	<title>A ScratchX extension for basic messaging</title>
+	<link rel="stylesheet" href="style.css">
+	<style>
+		.markdown-body {
+			box-sizing: border-box;
+			min-width: 200px;
+			max-width: 740px;
+			margin: 0 auto;
+			padding: 45px;
+	}
+
+		@media (max-width: 767px) {
+			.markdown-body {
+				padding: 15px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<article class="markdown-body"><h2 id="basic-messaging-across-projects">Basic messaging across projects</h2>
+<p><em>A ScratchX extension that connects to a simple messages relay server</em></p>
+<h1 id="-ada-and-turing-s-chat-ada_and_turing_s_chat-gif-"><img src="ada_and_turing_s_chat.gif" alt="Ada and Turing&#39;s chat"></h1>
+<p>This ScratchX extension provides some inter project messaging capabilities to your ScratchX projects. Somebody creates a project, somebody else creates another project on another computer, and with this extension the two projects can send messages to each other.</p>
+<p>With this extension you can create chat apps or online games.</p>
+<p>This extension uses very basic messaging. It is enough to show basic messaging principles (connect, send, receive). But it misses some important features to create really useful project, like separated spaces on server or channels to send and listen to. Those features are implemented in another ScratchX <a href="../oio">extension for advanced messaging</a>.</p>
+<h3 id="basic-chat-app">Basic chat app</h3>
+<p>This one is a very simple chat app example: connect to a server, display messages from the server and let the user type some messages to send. </p>
+<p><a href="http://scratchx.org/?url=https://ogadaki.github.io/scratchx/soio/chat1.sbx#scratch"><img src="chat1.png" alt=""></a></p>
+<h3 id="real-chat-app">Real chat app</h3>
+<p>Same as above but ask the user to pick a nickname so that every one knows who&#39;s talking.</p>
+<p><a href="http://scratchx.org/?url=https://ogadaki.github.io/scratchx/soio/chat2.sbx#scratch"><img src="chat2.gif" alt=""></a></p>
+<h3 id="empty-project">Empty project</h3>
+<p>Here is a link to an empty ScratchX project with the extension loaded.</p>
+<p><a href="http://scratchx.org/?url=https://ogadaki.github.io/scratchx/soio/extension.js#scratch"><img src="empty.png" alt=""></a></p>
+<h3 id="blocks">Blocks</h3>
+<p>Here are the blocks you can use with this extension.</p>
+<h4 id="-connect-to-message-server-at-url-https-soio-ogadaki-now-sh-block_connect-png-"><img src="block_connect.png" alt="[connect to message server at URL (https://soio-ogadaki.now.sh)]"></h4>
+<p>Connect your project to an external message server. Typically you use this block only once at the start of the project. Even if there is no need for that, it is safe to call it several times. In that case it deconnects before reconnecting.</p>
+<p>The default URL points to a running server that we host for you. You are of course very welcome to use it, but be aware that it is public and you&#39;ll see every message other people send to it, and your message will be seen by everyone.</p>
+<p>If you need some privacy host your own server (for advanced users, see below) or use the <a href="../oio">advanced messaging extension</a>.</p>
+<h4 id="-send-message-to-server-block_send-png-"><img src="block_send.png" alt="[send (message) to server]"></h4>
+<p>Use this block to send a message to the server. Anyone that is connected to that server will see the message. For this block to work, one must have called the &quot;connect&quot; block above before.</p>
+<h4 id="-next-message-from-server-block_get-png-"><img src="block_get.png" alt="(next message from server)"></h4>
+<p>Reports the last message that was send to the server. That message can come from the current project or from any other project that is connected to the server. For this block to work, one must have called the &quot;connect&quot; block above before.</p>
+<h3 id="advanced-host-your-own-message-server">Advanced: host your own message server</h3>
+<p>This extension needs a running server to handle the relay of messages. The server is based on socket.io and is very simple. We are hosting one somewhere on the Internet that anyone can use (it is hosted here: <a href="https://soio-ogadaki.now.sh">https://soio-ogadaki.now.sh</a>).</p>
+<p>But if you want to host your own, it is very simple as long as you are familiar with Node.js. You only need to create a Node.js server and put it in a place where the users can connect. Here is the code for the server:</p>
+<pre><code class="lang-js"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">)()</span>
+<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">).</span><span class="nx">Server</span><span class="p">(</span><span class="nx">app</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">io</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;socket.io&#39;</span><span class="p">)(</span><span class="nx">http</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">res</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/index.html&#39;</span><span class="p">)</span>
+<span class="p">})</span>
+
+<span class="nx">io</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;new connection&#39;</span><span class="p">)</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">io</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="nx">http</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">)</span>
+</pre></div>
+
+</code></pre>
+<p>Of course, be sure to point to the address of this server in the block &quot;connect to the message server&quot; of your ScratchX projects.</p>
+<h4 id="about">About</h4>
+<p><em>This extension was first demoed during the Scratch conference in Bordeaux in 2017 (<a href="http://www.scratch2017bdx.org/fr/hello-world/">Scratch2017bdx</a>).</em></p>
+<p><em>Build by <a href="https://twitter.com/nnodot">@nnodot</a></em></p>
+    </article>
+</body>
+</html>
