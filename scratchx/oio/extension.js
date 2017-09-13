@@ -1,5 +1,5 @@
 (function (ext) {
-  ext.name = 'Message server'
+  ext.name = 'Message I/O'
 
   var startExtension = function () {
     // Cleanup function when the extension is unloaded
