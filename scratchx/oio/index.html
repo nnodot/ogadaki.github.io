@@ -33,7 +33,18 @@
 <h3 id="empty-project">Empty project</h3>
 <p>Here is a link to an empty ScratchX project with the extension loaded.</p>
 <p><a href="http://scratchx.org/?url=https://ogadaki.github.io/scratchx/oio/extension.js#scratch"><img src="empty.png" alt=""></a></p>
-<h3 id="more-examples-and-blocks-description">More examples and blocks description</h3>
+<h3 id="blocks">Blocks</h3>
+<p>Here are the blocks you can use with this extension.</p>
+<h4 id="-connect-to-message-server-block_connect-png-"><img src="block_connect.png" alt="connect to message server"></h4>
+<p>Connect your project to an external message server. Typically you use this block only once at the start of the project. Even if there is no need for that, it is safe to call it several times. In that case it deconnects before reconnecting.</p>
+<p>The default URL points to a running server that we host for you.</p>
+<p>Choose a <strong>key</strong> to define a communication space specific for your project. The messages will be seen only by projects that use this key. Use a key for your chat app, another one for your online race game, an other one for your online tic tac toe, etc. You can use any character you want for the key.</p>
+<p>Try to choose a key that is as <strong>unique</strong> as possible to avoid conflicting uses of key with projetcs from other people. Each time the extension is loaded a new random key is generated for you, like &quot;<strong>d274w7jkh9b</strong>&quot;. You can keep it but you are welcome to change it. If you have to comunicate the key to other people in the room you might want something easier to tell. For example you can use three random words like &quot;<strong>upstairs purple charts</strong>&quot;, it has a good chance to be unique and you can communicate it easily to others. You can also use the place your are and/or the time (for a workshop for example) as a way to make it a bit more unique, like &quot;<strong>La Compagnie du Code 2017 oct, chat app</strong>&quot;.</p>
+<h4 id="-send-message-to-server-block_send-png-"><img src="block_send.png" alt="send message to server"></h4>
+<p>Use this block to send a message to a channel. Anynone that is connected with the same key will receive this message (including you, of course). For this block to work, one must have called the &quot;connect&quot; block above before.</p>
+<h4 id="-next-message-from-server-block_get-png-"><img src="block_get.png" alt="next message from server"></h4>
+<p>Reports the last message that was send to a channel. That message can come from the current project or from any other project that is connected to the server with the same key. For this block to work, one must have called the &quot;connect&quot; block above before.</p>
+<h3 id="more-examples-and-description">More examples and description</h3>
 <p>This page is a work in progress. More info soon!</p>
 <h4 id="about">About</h4>
 <p><em>This extension was first demoed during the Scratch conference in Bordeaux in 2017 (<a href="http://www.scratch2017bdx.org/fr/hello-world/">Scratch2017bdx</a>).</em></p>
