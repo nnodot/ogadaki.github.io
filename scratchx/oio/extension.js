@@ -5,6 +5,8 @@
     // Cleanup function when the extension is unloaded
     ext._shutdown = function () {
       ext.socket.diconnect()
+      console.log(ext.channels)
+      ext.channels = {}
     }
 
     // Status reporting code
@@ -40,35 +42,68 @@
 
     ext.channels = {}
     ext.connect = function (url, key) {
-      if (ext.socket) {
-        ext.socket.disconnect()
-        ext.channels = {}
-      }
       var path = getPath(url)
       var key = createHash(key)
       var fullUrl = url + '/' + key + '?namespace=' + path + '/' + key
-      ext.socket = io(fullUrl, { forceNew: true, path: path })
+      if (fullUrl !== ext.currentConnectionFullUrl) {
+        if (ext.socket) {
+          ext.socket.disconnect()
+          ext.channels = {}
+          // Even if we disconnect and clear ext.channels in some case there
+          // is some problem. If:
+          // * one has a project that is running,
+          // * that has been connected to an URL,
+          // * that has a waiting "get" block (i.e. there is a callback
+          //   waiting in a callback queue for one channel)
+          // * if one changes the fullUrl (either with URL or key)
+          // * when one restarts the project (green flag)
+          // * the "get" block are stuck and never returns, because it is
+          //   waiting from the all callback in the queue.
+          // Apparently, when one stop a project, Scratch doesn't "stop" the
+          // waiting callbacks.
+          // One solution is to call all callbacks before reconnection, but it
+          // has the side effect to actually send the chosen content (null?,
+          // undefined?, some value?, but which one?) to the project.
+          //
+          // So don't clean the callbacks. We assume that one doesn't change
+          // url or key very often, and a save/reload fix the problem. We keep
+          // that and document it.
+        }
+        ext.socket = io(fullUrl, { forceNew: true, path: path })
+        ext.currentConnectionFullUrl = fullUrl
+        // console.log(`new connection to "${fullUrl}"`)
+      } else {
+        // console.log('keep existing connection')
+      }
     }
 
     ext.send_message = function (message, channel) {
+      // console.log(`send "${message}" to channel "${channel}"`)
       ext.socket.emit(channel, message)
     }
 
     ext.get_next_message = function (channel, callback) {
+      // console.log(`get message from channel "${channel}"`)
       if (ext.channels[channel] === undefined) {
+        // console.log(`channel doesn't exist, create it`)
         ext.channels[channel] = { messages: [], callbacks: [] }
         ext.socket.on(channel, function (message) {
+          // console.log(`server has send message "${message}" on channel "${channel}"`)
           if (ext.channels[channel].callbacks.length !== 0) {
+            // console.log(`a block is waiting for a message, send it to it. (1)`)
             var callback = ext.channels[channel].callbacks.shift()
             callback(message)
           } else {
+            // console.log('no waiting block for a message, queue the message. (1)')
             ext.channels[channel].messages.push(message)
           }
         })
       }
       if (ext.channels[channel].messages.length === 0) {
+        // console.log('no waiting message, queue the block.')
         ext.channels[channel].callbacks.push(callback)
       } else {
+        // console.log(`a message is waiting for a block, send it to it.`)
         var message = ext.channels[channel].messages.shift()
         callback(message)
       }
