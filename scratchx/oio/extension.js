@@ -38,9 +38,11 @@
       return parser.pathname
     }
 
+    ext.channels = {}
     ext.connect = function (url, key) {
       if (ext.socket) {
         ext.socket.disconnect()
+        ext.channels = {}
       }
       var path = getPath(url)
       var key = createHash(key)
@@ -52,7 +54,6 @@
       ext.socket.emit(channel, message)
     }
 
-    ext.channels = {}
     ext.get_next_message = function (channel, callback) {
       if (ext.channels[channel] === undefined) {
         ext.channels[channel] = { messages: [], callbacks: [] }
